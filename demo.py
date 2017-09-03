@@ -10,11 +10,12 @@ from common.log import errorMsg
 #     print e  
 #     errorMsg(e,'测试错误 ing')
 mongo = Mongo()
-client = mongo.client
 
+print '-----'
+client = mongo.client
+print client.nodes
+print client
 print client.address
 print [doc for doc in client.testDB.hehe.find()]
 
-# if __name__ == '__main__':
-#     Mongo.replicaSet()
-#     pass
+mongo.__conn__()

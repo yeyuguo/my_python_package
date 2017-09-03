@@ -33,7 +33,7 @@ logging.basicConfig(
     # filemode='a'
 )
 
-def errorMsg(e,msg=None):
+def errorMsg(e=None,msg=None):
     # tractback:  http://blog.csdn.net/handsomekang/article/details/9373035
     errInfo = '(%s),详细错误:%s'%(msg,e)
     logging.error('%s --- 错误代码 --- %s'%(errInfo,traceback.format_exc()))

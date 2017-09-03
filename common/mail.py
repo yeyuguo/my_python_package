@@ -1,26 +1,55 @@
 #coding:utf-8
-import email
-import os
-import email.mime.multipart
-from email import encoders
-from email.header import Header
-from email.mime.text import MIMEText
-from email.utils import parseaddr, formataddr
+__all__ = ['qq_send_mail']
+
+
+'''
+测试已经成功的邮件
+从 QQ 邮箱 发送到其他的邮箱
+'''
 import smtplib
+import traceback
+from email.mime.text import MIMEText
+from .log import errorMsg
 
 
-from_addr = '346243440@qq.com'
-password = 'llheofyodztymrbhegb'  # 第三方客户端需要用到的 授权码
-to_addr = 'xxx@xxx.com.cn'
+_user = "346243440@qq.com"
+_pwd  = "llheofyodztymrbhegb"
+_to   = "xxx@xxx.com.cn"
 
-smtp_server = 'smtp.qq.com'
-msg = MIMEText('hahaha','plain','utf-8')
-msg['From'] = 'come from QQ account'
-msg['To'] = '!'.join(to_addr)
-msg['Subject'] = Header('test email for use','utf-8').encode()
 
-server = smtplib.SMTP_SSL(smtp_server,465)
-server.set_debuglevel(1)
-server.login(from_addr,password)
-server.sendmail(from_addr, to_addr, msg.as_string())
-server.quit()
+def qq_send_mail(user=_user,pwd=_pwd,to_user=_to,subject="这是主题名称",msg_text="这是邮件的内容"):
+    # msg = MIMEText(msg_text,'plain','utf-8')
+    msg = MIMEText(msg_text)
+    msg["Subject"] = subject
+    msg["From"]    = user
+    msg["To"]      = to_user
+
+    try:
+        s = smtplib.SMTP_SSL("smtp.qq.com", 465)
+        s.login(user, pwd)
+        s.sendmail(user, to_user, msg.as_string())
+        s.quit()
+        print "Success send mail!"
+    except smtplib.SMTPException,e:
+        print "Falied send mail,%s "%e
+        errorMsg(e,'邮件发送失败【邮件主题是：%s】'%(subject))
+
+
+# _user = "346243440@qq.com"
+# _pwd  = "llheofyodztymrbhegb"
+# _to   = "xxx@xxx.com.cn"
+# msg = MIMEText("这是邮件的内容")
+# msg["Subject"] = "这是主题名称"
+# msg["From"]    = _user
+# msg["To"]      = _to
+# try:
+#     s = smtplib.SMTP_SSL("smtp.qq.com", 465)
+#     s.login(_user, _pwd)
+#     s.sendmail(_user, _to, msg.as_string())
+#     s.quit()
+#     print "Success!"
+# except smtplib.SMTPException,e:
+#     print "Falied,%s"%e 
+
+if __name__ == '__main__':
+    qq_send_mail()
