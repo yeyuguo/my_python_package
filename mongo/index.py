@@ -2,9 +2,11 @@
 print __package__
 print __name__
 
+import gevent
 from pymongo import *
 from common.log import logging,errorMsg
 from common.mail import qq_send_mail
+from common.weixin import WX_wxpy
 from common.config import getConfig
 try:
     # Python 3.x
@@ -14,6 +16,8 @@ except ImportError:
     from urllib import quote_plus
 
 __all__ =['Mongo']
+
+import pdb # 调试代码 TODO 需要删除的
 
 # 读取配置文件
 host = getConfig("database",'dbhost')
@@ -25,6 +29,23 @@ password = getConfig("database",'dbpassword')
 
 print '%s:%s:%s'%(host,port,replSet)
 
+# 异步登陆微信端
+wx_global = None
+node_warning = ''
+
+def weixin_tmp():
+    global wx_global
+    wx_global = WX_wxpy()
+    # wx_global.send_msg('hahahah')
+
+def tttt():
+    while wx_global is None:
+        gevent.sleep(0)
+        return 
+    print u'yes，终于异步过了'
+    wx_global.send_msg(node_warning)
+    
+    
 
 
 class Mongo():
@@ -34,8 +55,11 @@ class Mongo():
         nodeLength = len(self.client.nodes)
         print self.client.nodes
         print nodeLength
-        # 测试节点连接 至少有一个
-        self.nodes_tip(nodeLength)
+        # 异步发送邮件 警报
+        gevent.joinall([gevent.spawn(self.nodes_tip(nodeLength))])
+        # for t in _t:
+        #     print t
+        print u'测试会不会阻塞'
         # # 测试节点连接 一个都没有
         # try:
         #     self.client.test.test.find_one()
@@ -43,6 +67,9 @@ class Mongo():
         #     msg = 'mongodb 操作 document 检测，连接不上'
         #     print msg
         #     errorMsg(e,msg)
+        # 无任何集群节点，退出数据库
+        if nodeLength == 0:
+            return None
 
         if db is not None:
             self.db = self.__db__(db)
@@ -136,25 +163,48 @@ class Mongo():
         '''
         集群异常，邮件提醒
         '''
+        # TODO 微信发消息被阻塞了发不了
+        global node_warning
+        
+        # if wx is None:
+        #     wx = WX_wxpy()
+
         if node_num == 1:
             '''
             只有一个运行的节点
             TODO 邮件 发送，提醒集群只有一个或不存在集群了
             '''
-            msg = '该 "%s" 集群只剩下一个,目前正在运行的 mongodb server 节点有:,%s'%(replSet,[p[1] for p in self.client.nodes])
-            logging.warning(msg)
-            qq_send_mail(subject="mongodb 集群 backup 剩余一个节点预警",msg_text=msg,to_user="346243440@qq.com")
-            pass
+            node_warning = '该 "%s" 集群只剩下一个,目前正在运行的 mongodb server 节点有:,%s'%(replSet,[p[1] for p in self.client.nodes])
+            logging.warning(node_warning)
+            qq_send_mail(subject="mongodb 集群 backup 剩余一个节点预警",msg_text=node_warning,to_user="346243440@qq.com")
+            
         elif node_num == 0 :
             '''
             没有任何运行的节点
             TODO 微信 发送，提醒集群没有节点运行
             '''
-            msg = '该 "%s" 集群没有运行的集群,目前正在运行的 mongodb server 节点有:%s'%(replSet,self.client.nodes)
-            logging.error(msg)
-            qq_send_mail(subject="mongodb 集群 backup 无节点预警",msg_text=msg,to_user="346243440@qq.com")
+            print u'测试发送邮件'
+            node_warning = '该 "%s" 集群没有运行的集群,目前正在运行的 mongodb server 节点有:%s'%(replSet,self.client.nodes)
+            logging.error(node_warning)
+            # gevent.joinall([gevent.spawn(qq_send_mail,subject="mongodb 集群 backup 无节点预警",msg_text=node_warning,to_user="346243440@qq.com")])
             
-        print msg
+            qq_send_mail(subject="mongodb 集群 backup 无节点预警",msg_text=node_warning,to_user="346243440@qq.com")
+            # gevent.joinall([gevent.spawn(qq_send_mail,subject="mongodb 集群 backup 无节点预警",msg_text=node_warning,to_user="346243440@qq.com"),gevent.spawn(weixin_tmp)])
+            # pdb.set_trace()
+            # if wx_global is None:
+            #     gevent.sleep(0)
+            # else:
+            #     print u'正在发送消息'
+            #     wx_global.send_msg(node_warning)
+            # if wx_global is None:
+            #     while 
+            # else:
+            #     print u'正在发送消息'
+            #     wx_global.send_msg(node_warning)
+            # pass
+            
+            
+        # print msg.decode('unicode')
     def main(self):
         pass
     

@@ -15,6 +15,8 @@ from .log import errorMsg
 _user = "346243440@qq.com"
 _pwd  = "llheofyodztymrbhegb"
 _to   = "xxx@xxx.com.cn"
+_pwd  = "llheofodztmrbheb"
+_to   = "yeyuguo@goldwind.com.cn"
 
 
 def qq_send_mail(user=_user,pwd=_pwd,to_user=_to,subject="这是主题名称",msg_text="这是邮件的内容"):
