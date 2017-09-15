@@ -1,5 +1,5 @@
 #coding:utf-8
-from . import *
+from .__init__ import *
 
 @app_B.route('/test')
 def main():
