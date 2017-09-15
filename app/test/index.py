@@ -1,5 +1,6 @@
 #coding:utf-8
 from . import app_test
+from .__init__ import *
 
 
 
