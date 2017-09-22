@@ -6,6 +6,7 @@ from common.config import getConfig
 
 server_host = getConfig("server",'server_host')
 server_port = getConfig("server",'server_port')
+server_debug = getConfig("server",'server_debug')
 
 print 'server is %s:%s'%(server_host,server_port)
 
@@ -26,11 +27,18 @@ def runServer(debug=True,port=80):
 
 if __name__ == '__main__':
     #runServer(debug=False,port=sys.argv[1])
-    debug = False
-    port = server_port
+    debug = True
+    port = int(server_port)
     if len(sys.argv)>1:
         debug = sys.argv[1]
     elif len(sys.argv)>2:
         debug = sys.argv[1]
-        port = sys.argv[2]
-    runServer(debug=debug,port=port)
+        port = sys.argv[2]         
+    try:
+        # pdb.set_trace()
+        if debug == 'True':
+            runServer(debug=True,port=port)
+        else:
+            runServer(debug=False,port=port)
+    except Exception,e:
+        print '---->',traceback.format_exc()

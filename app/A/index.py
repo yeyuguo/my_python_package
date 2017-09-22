@@ -8,4 +8,7 @@ def main():
 
 
 
-
+from flask import render_template
+@app_A.route('/api')
+def api():
+    return render_template('A_api.html')
