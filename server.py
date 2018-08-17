@@ -1,6 +1,7 @@
 #coding:utf-8
 import sys
 from app.index import app
+import traceback
 
 from common.config import getConfig
 

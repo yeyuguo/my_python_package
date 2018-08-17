@@ -1,0 +1,6 @@
+*.pyc
+logs/*.log
+*.log
+dbs
+mongodb_backup.key
+相关文件/
