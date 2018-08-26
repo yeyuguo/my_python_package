@@ -18,6 +18,12 @@ def set_log_fileTime():
 
 # set_log_fileTime()
 
+import os
+path = os.path.dirname(__file__) 
+logsPath = path + '/../logs'
+if os.path.exists(logsPath)  is False:
+    os.makedirs(logsPath)
+
 error_mongo_file = os.path.join(os.path.split(os.path.realpath(__file__))[0] + '../logs/mongo/error_%s.log'%set_log_fileTime())
 
 '''
