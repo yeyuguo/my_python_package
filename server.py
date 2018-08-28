@@ -1,5 +1,6 @@
 #coding:utf-8
 import sys
+import pdb
 from app.index import app
 
 from common.config import getConfig
@@ -41,4 +42,5 @@ if __name__ == '__main__':
         else:
             runServer(debug=False,port=port)
     except Exception,e:
-        print '---->',traceback.format_exc()
+	pass
+        #print '---->',traceback.format_exc()
